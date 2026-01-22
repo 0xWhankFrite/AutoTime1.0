@@ -166,13 +166,6 @@ const WPLS_ABI = [
   }
 ];
 
-// Helper to calculate gas cost
-function calculateGasCost(receipt) {
-  // Use effectiveGasPrice for EIP-1559 transactions, fallback to gasPrice for legacy
-  const gasPrice = receipt.effectiveGasPrice || receipt.gasPrice;
-  return receipt.gasUsed * gasPrice;
-}
-
 // Helper to get user input
 function getUserInput(prompt) {
   return new Promise((resolve) => {
