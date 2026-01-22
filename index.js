@@ -215,6 +215,15 @@ class TimeDividendClaimer {
     this.timeSlippagePercent = parseFloat(process.env.TIME_SLIPPAGE_PERCENT || '1');
     this.st3SlippagePercent = parseFloat(process.env.ST3_SLIPPAGE_PERCENT || '5');
 
+    // Detect test mode - no private key means test mode
+    this.testMode = !this.privateKey;
+    if (this.testMode) {
+      console.log('\n🧪 TEST MODE ENABLED - No transactions will be executed\n');
+      // Use dummy values for test mode
+      this.walletAddress = this.walletAddress || '0x0000000000000000000000000000000000000001';
+      this.st3Recipient = this.st3Recipient || '0x0000000000000000000000000000000000000002';
+    }
+
     // Health monitoring
     this.lastSuccessfulOperation = Date.now();
     this.operationCount = 0;
@@ -225,7 +234,16 @@ class TimeDividendClaimer {
     this.validateConfig();
 
     // Initialize provider and wallet
-    this.initializeProvider();
+    if (!this.testMode) {
+      this.initializeProvider();
+    } else {
+      this.provider = null;
+      this.wallet = null;
+      this.timeContract = null;
+      this.plsxRouter = null;
+      this.st3Contract = null;
+      this.wplsContract = null;
+    }
 
     // Price monitoring state
     this.priceMonitoringActive = true;
@@ -251,8 +269,14 @@ class TimeDividendClaimer {
     
     // Track if we're in the middle of a claim sequence
     this.isClaimingInProgress = false;
+    
+    // Test mode balances
+    this.testTimeBalance = ethers.parseEther('100');
+    this.testPlsBalance = ethers.parseEther('5000');
+    this.testClaimable = ethers.parseEther('2500');
 
-    console.log('✅ Initialized Time Dividend Claimer');
+    const modeLabel = this.testMode ? '🧪 TEST MODE' : '✅ PRODUCTION MODE';
+    console.log(`${modeLabel} Initialized Time Dividend Claimer`);
     console.log(`📊 Monitoring wallet: ${this.walletAddress}`);
     console.log(`💰 Claim threshold: ${ethers.formatEther(this.thresholdPls)} PLS`);
     console.log(`🔄 Compound percentage (TIME): ${this.compoundPercentage}%`);
@@ -261,24 +285,28 @@ class TimeDividendClaimer {
     console.log(`📤 ST3 recipient: ${this.st3Recipient}`);
     console.log(`⏰ Check interval: ${this.claimCheckInterval / 60000} minutes`);
     console.log(`💱 Price check interval: ${this.priceCheckInterval / 1000} seconds`);
-    console.log(`🌐 Primary RPC: ${this.rpcUrls[0]}`);
-    console.log(`🔄 Backup RPCs: ${this.rpcUrls.length - 1} available\n`);
+    if (!this.testMode) {
+      console.log(`🌐 Primary RPC: ${this.rpcUrls[0]}`);
+      console.log(`🔄 Backup RPCs: ${this.rpcUrls.length - 1} available`);
+    }
+    console.log('');
   }
 
   validateConfig() {
-    if (!this.privateKey) {
-      throw new Error('❌ PRIVATE_KEY not set in .env file');
+    // Skip private key check in test mode
+    if (!this.testMode && !this.privateKey) {
+      throw new Error('❌ PRIVATE_KEY not set in .env file. Use test mode: run with PRIVATE_KEY unset');
     }
-    if (!this.walletAddress) {
+    if (!this.testMode && !this.walletAddress) {
       throw new Error('❌ WALLET_ADDRESS not set in .env file');
     }
-    if (!ethers.isAddress(this.walletAddress)) {
+    if (!this.testMode && !ethers.isAddress(this.walletAddress)) {
       throw new Error('❌ WALLET_ADDRESS is not a valid Ethereum address');
     }
-    if (!this.st3Recipient) {
+    if (!this.testMode && !this.st3Recipient) {
       throw new Error('❌ ST3_RECIPIENT_ADDRESS not set in .env file');
     }
-    if (!ethers.isAddress(this.st3Recipient)) {
+    if (!this.testMode && !ethers.isAddress(this.st3Recipient)) {
       throw new Error('❌ ST3_RECIPIENT_ADDRESS is not a valid Ethereum address');
     }
     if (this.compoundPercentage < 0 || this.compoundPercentage > 100) {
@@ -323,6 +351,11 @@ class TimeDividendClaimer {
   }
 
   async validateContractAbis() {
+    if (this.testMode) {
+      console.log('\n🧪 Skipping contract validation in test mode');
+      return true;
+    }
+
     try {
       console.log('\n🔍 Validating contract ABIs and addresses...');
       
@@ -824,6 +857,21 @@ class TimeDividendClaimer {
     try {
       console.log(`🔄 Claiming ${ethers.formatEther(amount)} PLS...`);
       
+      if (this.testMode) {
+        console.log(`📝 [TEST MODE] Simulated transaction: 0x` + '0'.repeat(64));
+        const mockReceipt = {
+          blockNumber: 999999,
+          gasUsed: 123456n,
+          effectiveGasPrice: ethers.parseUnits('100', 'gwei')
+        };
+        const gasCost = this.calculateGasCost(mockReceipt);
+        console.log(`✅ Dividend claimed! Block: ${mockReceipt.blockNumber}`);
+        console.log(`⛽ Gas used (simulated): ${ethers.formatEther(gasCost)} PLS`);
+        this.recordSuccessfulOperation();
+        this.testPlsBalance += amount;
+        return { receipt: mockReceipt, gasCost };
+      }
+      
       // claimDividend expects the amount in wei (uint256)
       const tx = await this.timeContract.claimDividend(this.walletAddress, amount, {
         gasLimit: 300000
@@ -1006,16 +1054,26 @@ class TimeDividendClaimer {
       const timestamp = new Date().toLocaleString();
       console.log(`\n⏰ [${timestamp}] Checking for claimable dividends...`);
 
-      // Get balances before claim - wrapped in retry logic
-      const timeBalance = await this.executeWithRetry(
-        async () => await this.timeContract.balanceOf(this.walletAddress),
-        'getTimeBalance'
-      );
-      const plsBalanceBefore = await this.executeWithRetry(
-        async () => await this.provider.getBalance(this.walletAddress),
-        'getPlsBalance'
-      );
-      const claimable = await this.getClaimableDividend();
+      let timeBalance, plsBalanceBefore, claimable;
+      
+      if (this.testMode) {
+        // Use simulated test balances
+        timeBalance = this.testTimeBalance;
+        plsBalanceBefore = this.testPlsBalance;
+        claimable = this.testClaimable;
+      } else {
+        // Get balances before claim - wrapped in retry logic
+        timeBalance = await this.executeWithRetry(
+          async () => await this.timeContract.balanceOf(this.walletAddress),
+          'getTimeBalance'
+        );
+        plsBalanceBefore = await this.executeWithRetry(
+          async () => await this.provider.getBalance(this.walletAddress),
+          'getPlsBalance'
+        );
+        claimable = await this.getClaimableDividend();
+      }
+      
       const claimableFormatted = ethers.formatEther(claimable);
 
       // Store initial balances if not set
