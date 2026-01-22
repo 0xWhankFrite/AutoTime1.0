@@ -13,7 +13,6 @@ Automated TIME token dividend claimer and portfolio manager for PulseChain with 
   - Sell TIME when price increases by threshold percentage
   - Buy TIME when price decreases by threshold percentage
   - Tracks reference prices to ensure only ONE trade per price movement
-- **Gas Optimization**: Uses router multicall for TIME→PLS swaps (saves ~10 PLS per transaction)
 - **Multi-RPC Failover**: Automatic backup RPC switching for reliability
 - **Session Tracking**: Real-time balance monitoring and cumulative statistics
 - **Smart Contract Interaction**: Full contract interaction with approvals and gas estimation
