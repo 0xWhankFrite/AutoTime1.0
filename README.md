@@ -2,6 +2,8 @@
 
 *READ ALL OF THIS*
 
+--*MAY HAVE BUGS UNTIL THIS LINE IS REMOVED*--
+
 Automated TIME token dividend claimer and portfolio manager for PulseChain with advanced trading features.
 
 ## Features ✨
