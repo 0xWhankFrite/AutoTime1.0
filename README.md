@@ -1,5 +1,7 @@
 # AutoTime Claimer 🤖
 
+*READ ALL OF THIS*
+
 Automated TIME token dividend claimer and portfolio manager for PulseChain with advanced trading features.
 
 ## Features ✨
@@ -18,6 +20,7 @@ Automated TIME token dividend claimer and portfolio manager for PulseChain with 
 
 ## Prerequisites 📋
 
+- Read entire README
 - Node.js v16 or higher
 - TIME tokens in your PulseChain wallet
 - PulseChain native coins (PLS) for gas fees
