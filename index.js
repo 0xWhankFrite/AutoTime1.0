@@ -596,44 +596,47 @@ class TimeDividendClaimer {
         console.log('⚠️  Could not fetch price, proceeding without slippage protection');
       }
 
-      // Path: TIME -> WPLS -> PLS using multicall for gas efficiency
-      const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minute deadline
-
-      // Encode swap functions for multicall
-      // First swap: TIME -> WPLS
-      const swap1Data = this.plsxRouter.interface.encodeFunctionData('swapExactTokensForTokensV2', [
+      // Step 1: Swap TIME -> WPLS
+      console.log(`🔄 Swapping TIME for WPLS...`);
+      const tx1 = await this.plsxRouter.swapExactTokensForTokensV2(
         sellAmount,
         amountOutMin,
         [TIME_ADDRESS, WPLS_ADDRESS],
-        PLSX_ROUTER_ADDRESS, // Send WPLS to router for second swap
-      ]);
-
-      // Second swap: WPLS -> PLS (native)
-      const swap2Data = this.plsxRouter.interface.encodeFunctionData('swapExactTokensForETH', [
-        ethers.MaxUint256, // Will use all WPLS from previous swap
-        amountOutMin,
-        [WPLS_ADDRESS],
         this.wallet.address,
-        deadline
-      ]);
-
-      // Execute both swaps in one transaction for gas efficiency
-      const tx = await this.plsxRouter.multicall(
-        deadline,
-        [swap1Data, swap2Data],
         {
-          gasLimit: 700000
+          gasLimit: 500000
         }
       );
 
-      console.log(`📝 TIME sale transaction sent: ${tx.hash}`);
-      const receipt = await tx.wait();
-      const gasCost = this.calculateGasCost(receipt);
-      console.log(`✅ TIME sold! Block: ${receipt.blockNumber}`);
-      console.log(`⛽ Gas used: ${ethers.formatEther(gasCost)} PLS`);
-      this.recordSuccessfulOperation();
+      console.log(`📝 TIME→WPLS transaction sent: ${tx1.hash}`);
+      const receipt1 = await tx1.wait();
+      const gasCost1 = this.calculateGasCost(receipt1);
+      console.log(`✅ TIME swapped for WPLS! Block: ${receipt1.blockNumber}`);
+      console.log(`⛽ Gas used: ${ethers.formatEther(gasCost1)} PLS`);
 
-      return { receipt, gasCost, amountSold: sellAmount };
+      // Step 2: Unwrap WPLS -> PLS
+      console.log(`🔄 Unwrapping WPLS to native PLS...`);
+      const wplsBalance = await this.executeWithRetry(
+        async () => await this.wplsContract.balanceOf(this.walletAddress),
+        'getWplsBalance'
+      );
+
+      if (wplsBalance > 0n) {
+        const tx2 = await this.wplsContract.withdraw(wplsBalance, { gasLimit: 100000 });
+        console.log(`📝 WPLS unwrap transaction sent: ${tx2.hash}`);
+        const receipt2 = await tx2.wait();
+        const gasCost2 = this.calculateGasCost(receipt2);
+        console.log(`✅ WPLS unwrapped to PLS! Block: ${receipt2.blockNumber}`);
+        console.log(`⛽ Gas used: ${ethers.formatEther(gasCost2)} PLS`);
+        
+        const totalGasCost = gasCost1 + gasCost2;
+        this.recordSuccessfulOperation();
+        return { receipt: receipt2, gasCost: totalGasCost, amountSold: sellAmount };
+      } else {
+        console.log(`⚠️  No WPLS balance to unwrap`);
+        this.recordSuccessfulOperation();
+        return { receipt: receipt1, gasCost: gasCost1, amountSold: sellAmount };
+      }
     } catch (error) {
       console.error('❌ Error selling TIME token:', error.message);
       return null;
