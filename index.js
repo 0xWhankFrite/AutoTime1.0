@@ -94,6 +94,16 @@ const PLSX_ROUTER_ABI = [
     "outputs": [{"internalType": "bytes[]", "name": "results", "type": "bytes[]"}],
     "stateMutability": "payable",
     "type": "function"
+  },
+  {
+    "inputs": [
+      {"internalType": "uint256", "name": "amountIn", "type": "uint256"},
+      {"internalType": "address[]", "name": "path", "type": "address[]"}
+    ],
+    "name": "getAmountsOut",
+    "outputs": [{"internalType": "uint256[]", "name": "amounts", "type": "uint256[]"}],
+    "stateMutability": "view",
+    "type": "function"
   }
 ];
 
@@ -178,6 +188,12 @@ function getUserInput(prompt) {
 }
 
 class TimeDividendClaimer {
+  calculateGasCost(receipt) {
+    // Use effectiveGasPrice for EIP-1559 transactions, fallback to gasPrice for legacy
+    const gasPrice = receipt.effectiveGasPrice || receipt.gasPrice;
+    return receipt.gasUsed * gasPrice;
+  }
+
   constructor() {
     // Load configuration
     this.rpcUrls = [
@@ -505,17 +521,25 @@ class TimeDividendClaimer {
       if (priceChange >= this.timeIncreasePercent) {
         // TIME increased - SELL
         console.log(`\n🚀 TIME price increased ${priceChange.toFixed(2)}% (threshold: ${this.timeIncreasePercent}%) - SELLING TIME`);
-        await this.sellTimeToken(this.sellPercentageOnIncrease);
-        // Update reference price after successful trade
-        this.referencePriceForTrading = this.currentTimePriceInPls;
-        console.log(`📍 Reference price updated to: ${this.referencePriceForTrading.toFixed(8)}`);
+        const sellResult = await this.sellTimeToken(this.sellPercentageOnIncrease);
+        // Update reference price ONLY after successful trade
+        if (sellResult) {
+          this.referencePriceForTrading = this.currentTimePriceInPls;
+          console.log(`📍 Reference price updated to: ${this.referencePriceForTrading.toFixed(8)}`);
+        } else {
+          console.log('⚠️  Trade failed, reference price not updated');
+        }
       } else if (priceChange <= -this.timeDecreasePercent) {
         // TIME decreased - BUY
         console.log(`\n📉 TIME price decreased ${Math.abs(priceChange).toFixed(2)}% (threshold: ${this.timeDecreasePercent}%) - BUYING TIME`);
-        await this.buyTimeWithPls(this.buyPercentageOnDecrease);
-        // Update reference price after successful trade
-        this.referencePriceForTrading = this.currentTimePriceInPls;
-        console.log(`📍 Reference price updated to: ${this.referencePriceForTrading.toFixed(8)}`);
+        const buyResult = await this.buyTimeWithPls(this.buyPercentageOnDecrease);
+        // Update reference price ONLY after successful trade
+        if (buyResult) {
+          this.referencePriceForTrading = this.currentTimePriceInPls;
+          console.log(`📍 Reference price updated to: ${this.referencePriceForTrading.toFixed(8)}`);
+        } else {
+          console.log('⚠️  Trade failed, reference price not updated');
+        }
       }
     } catch (error) {
       console.error('❌ Error handling price movement:', error.message);
@@ -648,7 +672,8 @@ class TimeDividendClaimer {
         console.log('⚠️  Could not fetch price, proceeding without slippage protection');
       }
 
-      // Path: PLS -> TIME
+      // Path: PLS -> WPLS -> TIME (need to wrap native PLS first via value parameter)
+      // When sending native PLS with value parameter, router automatically handles conversion
       const path = [WPLS_ADDRESS, TIME_ADDRESS];
 
       const tx = await this.plsxRouter.swapExactTokensForTokensV2(
@@ -657,7 +682,7 @@ class TimeDividendClaimer {
         path,
         this.wallet.address,
         {
-          value: buyAmount,
+          value: buyAmount,  // Send native PLS - router wraps it to WPLS
           gasLimit: 500000
         }
       );
