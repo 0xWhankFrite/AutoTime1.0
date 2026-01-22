@@ -1,0 +1,22 @@
+{
+  "name": "autotime-claimer",
+  "version": "1.0.0",
+  "description": "Automated TIME token dividend claimer and exampleToken buyer on PulseChain",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "pulsechain",
+    "time",
+    "dividend",
+    "automation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "ethers": "^6.9.0",
+    "dotenv": "^16.3.1"
+  }
+}

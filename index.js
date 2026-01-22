@@ -6,161 +6,25 @@ dotenv.config();
 
 // Contract addresses
 const TIME_ADDRESS = '0xCA35638A3fdDD02fEC597D8c1681198C06b23F58';
-const ST3_ADDRESS = '0x2806F9d083BABbDbB9a92b0722F1b5D4E6FEF6cC';
+const EXAMPLE_TOKEN_ADDRESS = '0xAddressHere';
 const PLSX_ROUTER_ADDRESS = '0xDA9aBA4eACF54E0273f56dfFee6B8F1e20B23Bba';
 const WPLS_ADDRESS = '0xA1077a294dDE1B09bB078844df40758a5D0f9a27';
 
 // TIME Token ABI (only the functions we need)
-const TIME_ABI = [
-  {
-    "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
-    "name": "balanceOf",
-    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
-    "name": "claimableDividendOf",
-    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {"internalType": "address payable", "name": "recipient", "type": "address"},
-      {"internalType": "uint256", "name": "amount", "type": "uint256"}
-    ],
-    "name": "claimDividend",
-    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {"internalType": "address", "name": "spender", "type": "address"},
-      {"internalType": "uint256", "name": "amount", "type": "uint256"}
-    ],
-    "name": "approve",
-    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {"internalType": "address", "name": "owner", "type": "address"},
-      {"internalType": "address", "name": "spender", "type": "address"}
-    ],
-    "name": "allowance",
-    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-    "stateMutability": "view",
-    "type": "function"
-  }
-];
+const TIME_ABI = [{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"claimableDividendOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address payable","name":"recipient","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"claimDividend","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}];
 
 // PLSX Router ABI (only the functions we need)
-const PLSX_ROUTER_ABI = [
-  {
-    "inputs": [
-      {"internalType": "uint256", "name": "amountIn", "type": "uint256"},
-      {"internalType": "uint256", "name": "amountOutMin", "type": "uint256"},
-      {"internalType": "address[]", "name": "path", "type": "address[]"},
-      {"internalType": "address", "name": "to", "type": "address"}
-    ],
-    "name": "swapExactTokensForTokensV2",
-    "outputs": [{"internalType": "uint256", "name": "amountOut", "type": "uint256"}],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {"internalType": "uint256", "name": "amountIn", "type": "uint256"},
-      {"internalType": "uint256", "name": "amountOutMin", "type": "uint256"},
-      {"internalType": "address[]", "name": "path", "type": "address[]"},
-      {"internalType": "address", "name": "to", "type": "address"},
-      {"internalType": "uint256", "name": "deadline", "type": "uint256"}
-    ],
-    "name": "swapExactTokensForETH",
-    "outputs": [{"internalType": "uint256[]", "name": "amounts", "type": "uint256[]"}],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {"internalType": "uint256", "name": "deadline", "type": "uint256"},
-      {"internalType": "bytes[]", "name": "data", "type": "bytes[]"}
-    ],
-    "name": "multicall",
-    "outputs": [{"internalType": "bytes[]", "name": "results", "type": "bytes[]"}],
-    "stateMutability": "payable",
-    "type": "function"
-  }
-];
+const PLSX_ROUTER_ABI = [{"inputs":[{"internalType":"uint256","name":"amountIn","type":"uint256"},{"internalType":"uint256","name":"amountOutMin","type":"uint256"},{"internalType":"address[]","name":"path","type":"address[]"},{"internalType":"address","name":"to","type":"address"}],"name":"swapExactTokensForTokensV2","outputs":[{"internalType":"uint256","name":"amountOut","type":"uint256"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"uint256","name":"amountIn","type":"uint256"},{"internalType":"uint256","name":"amountOutMin","type":"uint256"},{"internalType":"address[]","name":"path","type":"address[]"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"deadline","type":"uint256"}],"name":"swapExactTokensForETH","outputs":[{"internalType":"uint256[]","name":"amounts","type":"uint256[]"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"deadline","type":"uint256"},{"internalType":"bytes[]","name":"data","type":"bytes[]"}],"name":"multicall","outputs":[{"internalType":"bytes[]","name":"results","type":"bytes[]"}],"stateMutability":"payable","type":"function"}];
 
 // ERC20 ABI for token transfers
-const ERC20_ABI = [
-  {
-    "inputs": [
-      {"internalType": "address", "name": "to", "type": "address"},
-      {"internalType": "uint256", "name": "amount", "type": "uint256"}
-    ],
-    "name": "transfer",
-    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
-    "name": "balanceOf",
-    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {"internalType": "address", "name": "spender", "type": "address"},
-      {"internalType": "uint256", "name": "amount", "type": "uint256"}
-    ],
-    "name": "approve",
-    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {"internalType": "address", "name": "owner", "type": "address"},
-      {"internalType": "address", "name": "spender", "type": "address"}
-    ],
-    "name": "allowance",
-    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-    "stateMutability": "view",
-    "type": "function"
-  }
-];
+const ERC20_ABI = [{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}];
 
 // WPLS ABI for unwrapping
-const WPLS_ABI = [
-  {
-    "inputs": [{"internalType": "uint256", "name": "wad", "type": "uint256"}],
-    "name": "withdraw",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
-    "name": "balanceOf",
-    "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-    "stateMutability": "view",
-    "type": "function"
-  }
-];
+const WPLS_ABI = [{"inputs":[{"internalType":"uint256","name":"wad","type":"uint256"}],"name":"withdraw","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}];
 
 // Helper to calculate gas cost
 function calculateGasCost(receipt) {
-  // Use effectiveGasPrice for EIP-1559 transactions, fallback to gasPrice for legacy
-  const gasPrice = receipt.effectiveGasPrice || receipt.gasPrice;
-  return receipt.gasUsed * gasPrice;
+  return receipt.gasUsed * receipt.gasPrice;
 }
 
 // Helper to get user input
@@ -192,18 +56,8 @@ class TimeDividendClaimer {
     this.thresholdPls = ethers.parseEther(process.env.THRESHOLD_PLS || '1500');
     this.compoundPercentage = parseInt(process.env.COMPOUND_PERCENTAGE || '15');
     this.buyPercentage = parseInt(process.env.BUY_PERCENTAGE || '55');
-    this.st3Recipient = process.env.ST3_RECIPIENT_ADDRESS;
+    this.exampleTokenRecipient = process.env.EXAMPLE_TOKEN_RECIPIENT_ADDRESS;
     this.claimCheckInterval = parseInt(process.env.CLAIM_CHECK_INTERVAL_MINUTES || '15') * 60 * 1000;
-    
-    // Slippage tolerance percentages for swaps
-    this.timeSlippagePercent = parseFloat(process.env.TIME_SLIPPAGE_PERCENT || '1');
-    this.st3SlippagePercent = parseFloat(process.env.ST3_SLIPPAGE_PERCENT || '5');
-
-    // Health monitoring
-    this.lastSuccessfulOperation = Date.now();
-    this.operationCount = 0;
-    this.healthCheckInterval = 5 * 60 * 1000; // Check every 5 minutes
-    this.maxInactivityTime = 30 * 60 * 1000; // Alert if no activity for 30 minutes
 
     // Validate configuration
     this.validateConfig();
@@ -240,9 +94,9 @@ class TimeDividendClaimer {
     console.log(`📊 Monitoring wallet: ${this.walletAddress}`);
     console.log(`💰 Claim threshold: ${ethers.formatEther(this.thresholdPls)} PLS`);
     console.log(`🔄 Compound percentage (TIME): ${this.compoundPercentage}%`);
-    console.log(`📈 Buy percentage (ST3): ${this.buyPercentage}%`);
+    console.log(`📈 Buy percentage (exampleToken): ${this.buyPercentage}%`);
     console.log(`💵 Keep in wallet: ${100 - this.compoundPercentage - this.buyPercentage}%`);
-    console.log(`📤 ST3 recipient: ${this.st3Recipient}`);
+    console.log(`📤 exampleToken recipient: ${this.exampleTokenRecipient}`);
     console.log(`⏰ Check interval: ${this.claimCheckInterval / 60000} minutes`);
     console.log(`💱 Price check interval: ${this.priceCheckInterval / 1000} seconds`);
     console.log(`🌐 Primary RPC: ${this.rpcUrls[0]}`);
@@ -256,14 +110,8 @@ class TimeDividendClaimer {
     if (!this.walletAddress) {
       throw new Error('❌ WALLET_ADDRESS not set in .env file');
     }
-    if (!ethers.isAddress(this.walletAddress)) {
-      throw new Error('❌ WALLET_ADDRESS is not a valid Ethereum address');
-    }
-    if (!this.st3Recipient) {
-      throw new Error('❌ ST3_RECIPIENT_ADDRESS not set in .env file');
-    }
-    if (!ethers.isAddress(this.st3Recipient)) {
-      throw new Error('❌ ST3_RECIPIENT_ADDRESS is not a valid Ethereum address');
+    if (!this.exampleTokenRecipient) {
+      throw new Error('❌ EXAMPLE_TOKEN_RECIPIENT_ADDRESS not set in .env file');
     }
     if (this.compoundPercentage < 0 || this.compoundPercentage > 100) {
       throw new Error('❌ COMPOUND_PERCENTAGE must be between 0 and 100');
@@ -273,12 +121,6 @@ class TimeDividendClaimer {
     }
     if (this.compoundPercentage + this.buyPercentage > 100) {
       throw new Error('❌ COMPOUND_PERCENTAGE + BUY_PERCENTAGE must not exceed 100');
-    }
-    if (this.timeSlippagePercent < 0 || this.timeSlippagePercent > 50) {
-      throw new Error('❌ TIME_SLIPPAGE_PERCENT must be between 0 and 50');
-    }
-    if (this.st3SlippagePercent < 0 || this.st3SlippagePercent > 100) {
-      throw new Error('❌ ST3_SLIPPAGE_PERCENT must be between 0 and 100');
     }
   }
 
@@ -299,60 +141,11 @@ class TimeDividendClaimer {
     // Initialize contracts
     this.timeContract = new ethers.Contract(TIME_ADDRESS, TIME_ABI, this.wallet);
     this.plsxRouter = new ethers.Contract(PLSX_ROUTER_ADDRESS, PLSX_ROUTER_ABI, this.wallet);
-    this.st3Contract = new ethers.Contract(ST3_ADDRESS, ERC20_ABI, this.wallet);
+    this.exampleTokenContract = new ethers.Contract(EXAMPLE_TOKEN_ADDRESS, ERC20_ABI, this.wallet);
     this.wplsContract = new ethers.Contract(WPLS_ADDRESS, WPLS_ABI, this.wallet);
 
     // Track gas costs
     this.totalGasSpent = 0n;
-  }
-
-  async validateContractAbis() {
-    try {
-      console.log('\n🔍 Validating contract ABIs and addresses...');
-      
-      // Check if contracts are at expected addresses
-      console.log(`   Checking TIME at ${TIME_ADDRESS}...`);
-      const timeCode = await this.provider.getCode(TIME_ADDRESS);
-      if (timeCode === '0x') throw new Error(`TIME contract not found at ${TIME_ADDRESS}`);
-      console.log('   ✓ TIME contract found');
-      
-      console.log(`   Checking PLSX Router at ${PLSX_ROUTER_ADDRESS}...`);
-      const routerCode = await this.provider.getCode(PLSX_ROUTER_ADDRESS);
-      if (routerCode === '0x') throw new Error(`PLSX Router contract not found at ${PLSX_ROUTER_ADDRESS}`);
-      console.log('   ✓ PLSX Router contract found');
-      
-      console.log(`   Checking ST3 at ${ST3_ADDRESS}...`);
-      const st3Code = await this.provider.getCode(ST3_ADDRESS);
-      if (st3Code === '0x') throw new Error(`ST3 contract not found at ${ST3_ADDRESS}`);
-      console.log('   ✓ ST3 contract found');
-      
-      console.log(`   Checking WPLS at ${WPLS_ADDRESS}...`);
-      const wplsCode = await this.provider.getCode(WPLS_ADDRESS);
-      if (wplsCode === '0x') throw new Error(`WPLS contract not found at ${WPLS_ADDRESS}`);
-      console.log('   ✓ WPLS contract found');
-      
-      // Verify key functions exist by checking interface
-      console.log('   Checking TIME contract functions...');
-      const timeInterface = this.timeContract.interface;
-      if (!timeInterface.hasFunction('claimableDividendOf')) throw new Error('claimableDividendOf not in TIME ABI');
-      if (!timeInterface.hasFunction('claimDividend')) throw new Error('claimDividend not in TIME ABI');
-      if (!timeInterface.hasFunction('balanceOf')) throw new Error('balanceOf not in TIME ABI');
-      console.log('   ✓ All required TIME functions found');
-      
-      console.log('\n✅ All contracts validated successfully!');
-      return true;
-    } catch (error) {
-      console.error('\n❌ Contract validation failed:', error.message);
-      console.error('\n📋 Debugging information:');
-      console.error(`   Current RPC: ${this.rpcUrls[this.currentRpcIndex]}`);
-      console.error(`   Network ChainID: ${this.provider?.network?.chainId || 'unknown'}`);
-      console.error('\n💡 Possible solutions:');
-      console.error('   1. Check your internet connection');
-      console.error('   2. Verify RPC endpoint is responding');
-      console.error('   3. Confirm contract addresses in code are correct for PulseChain');
-      console.error('   4. Check if you are connected to the correct blockchain network');
-      return false;
-    }
   }
 
   async switchToNextRpc() {
@@ -475,26 +268,6 @@ class TimeDividendClaimer {
     }
   }
 
-  async unwrapWpls() {
-    try {
-      // Check WPLS balance
-      const wplsBalance = await this.executeWithRetry(
-        async () => await this.wplsContract.balanceOf(this.walletAddress),
-        'getWplsBalance'
-      );
-
-      if (wplsBalance > 0n) {
-        console.log(`\n🔄 Unwrapping ${ethers.formatEther(wplsBalance)} WPLS to PLS...`);
-        const tx = await this.wplsContract.withdraw(wplsBalance, { gasLimit: 100000 });
-        console.log(`📝 Unwrap transaction sent: ${tx.hash}`);
-        await tx.wait();
-        console.log(`✅ WPLS unwrapped! Block: ${(await tx.wait()).blockNumber}`);
-      }
-    } catch (error) {
-      console.error('⚠️  Error unwrapping WPLS:', error.message);
-    }
-  }
-
   async handlePriceMovement(priceChange) {
     try {
       if (this.isClaimingInProgress) {
@@ -557,23 +330,9 @@ class TimeDividendClaimer {
         console.log(`✅ TIME token approved!`);
       }
 
-      // Get current price to calculate slippage protection
-      const currentPrice = await this.getTimePriceInPls();
-      let amountOutMin = 0n;
-      
-      if (currentPrice) {
-        // Calculate expected PLS output with configurable slippage tolerance
-        const expectedPls = parseFloat(ethers.formatEther(sellAmount)) * currentPrice;
-        const slippageFraction = 1 - (this.timeSlippagePercent / 100);
-        const minPls = expectedPls * slippageFraction;
-        amountOutMin = ethers.parseEther(minPls.toFixed(18));
-        console.log(`📊 Minimum output (${this.timeSlippagePercent}% slippage): ${ethers.formatEther(amountOutMin)} PLS`);
-      } else {
-        console.log('⚠️  Could not fetch price, proceeding without slippage protection');
-      }
-
-      // Path: TIME -> WPLS -> PLS using multicall for gas efficiency
+      // Path: TIME -> WPLS -> native PLS using multicall for gas efficiency
       const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minute deadline
+      const amountOutMin = 0;
 
       // Encode swap functions for multicall
       // First swap: TIME -> WPLS
@@ -586,14 +345,14 @@ class TimeDividendClaimer {
 
       // Second swap: WPLS -> PLS (native)
       const swap2Data = this.plsxRouter.interface.encodeFunctionData('swapExactTokensForETH', [
-        ethers.MaxUint256, // Will use all WPLS from previous swap
+        ethers.MaxUint256, // Will use all WPLS from previous swap (router handles this)
         amountOutMin,
         [WPLS_ADDRESS],
         this.wallet.address,
         deadline
       ]);
 
-      // Execute both swaps in one transaction for gas efficiency
+      // Execute both swaps in one transaction
       const tx = await this.plsxRouter.multicall(
         deadline,
         [swap1Data, swap2Data],
@@ -604,10 +363,9 @@ class TimeDividendClaimer {
 
       console.log(`📝 TIME sale transaction sent: ${tx.hash}`);
       const receipt = await tx.wait();
-      const gasCost = this.calculateGasCost(receipt);
+      const gasCost = calculateGasCost(receipt);
       console.log(`✅ TIME sold! Block: ${receipt.blockNumber}`);
       console.log(`⛽ Gas used: ${ethers.formatEther(gasCost)} PLS`);
-      this.recordSuccessfulOperation();
 
       return { receipt, gasCost, amountSold: sellAmount };
     } catch (error) {
@@ -633,23 +391,9 @@ class TimeDividendClaimer {
 
       console.log(`🔄 Buying TIME with ${ethers.formatEther(buyAmount)} PLS (${buyPercentage}% of balance)...`);
 
-      // Get current price to calculate slippage protection
-      const currentPrice = await this.getTimePriceInPls();
-      let amountOutMin = 0n;
-      
-      if (currentPrice) {
-        // Calculate expected TIME output with configurable slippage tolerance
-        const expectedTime = parseFloat(ethers.formatEther(buyAmount)) / currentPrice;
-        const slippageFraction = 1 - (this.timeSlippagePercent / 100);
-        const minTime = expectedTime * slippageFraction;
-        amountOutMin = ethers.parseEther(minTime.toFixed(18));
-        console.log(`📊 Minimum output (${this.timeSlippagePercent}% slippage): ${ethers.formatEther(amountOutMin)} TIME`);
-      } else {
-        console.log('⚠️  Could not fetch price, proceeding without slippage protection');
-      }
-
-      // Path: PLS -> TIME
+      // Path: WPLS -> TIME
       const path = [WPLS_ADDRESS, TIME_ADDRESS];
+      const amountOutMin = 0;
 
       const tx = await this.plsxRouter.swapExactTokensForTokensV2(
         buyAmount,
@@ -664,10 +408,9 @@ class TimeDividendClaimer {
 
       console.log(`📝 TIME purchase transaction sent: ${tx.hash}`);
       const receipt = await tx.wait();
-      const gasCost = this.calculateGasCost(receipt);
+      const gasCost = calculateGasCost(receipt);
       console.log(`✅ TIME purchased! Block: ${receipt.blockNumber}`);
       console.log(`⛽ Gas used: ${ethers.formatEther(gasCost)} PLS`);
-      this.recordSuccessfulOperation();
 
       return { receipt, gasCost, amountSpent: buyAmount };
     } catch (error) {
@@ -773,27 +516,9 @@ class TimeDividendClaimer {
     }
   }
 
-  recordSuccessfulOperation() {
-    this.lastSuccessfulOperation = Date.now();
-    this.operationCount++;
-  }
-
-  checkHealth() {
-    const timeSinceLastOp = Date.now() - this.lastSuccessfulOperation;
-    const minutesInactive = Math.floor(timeSinceLastOp / 60000);
-    
-    if (timeSinceLastOp > this.maxInactivityTime) {
-      console.warn(`\n⚠️  ⚠️  ⚠️  HEALTH WARNING: No successful operations for ${minutesInactive} minutes!`);
-      console.warn(`   Last successful operation: ${new Date(this.lastSuccessfulOperation).toLocaleString()}`);
-      console.warn(`   Total operations completed: ${this.operationCount}`);
-      console.warn('   Bot may be stuck. Check RPC connection and contract state.\n');
-    } else if (minutesInactive > 5) {
-      console.log(`\n💚 Health check: Last operation ${minutesInactive} min ago (${this.operationCount} total)`);
-    }
-  }
-
   async claimDividend(amount) {
     try {
+      this.isClaimingInProgress = true;
       console.log(`🔄 Claiming ${ethers.formatEther(amount)} PLS...`);
       
       // claimDividend expects the amount in wei (uint256)
@@ -803,10 +528,9 @@ class TimeDividendClaimer {
       
       console.log(`📝 Transaction sent: ${tx.hash}`);
       const receipt = await tx.wait();
-      const gasCost = this.calculateGasCost(receipt);
+      const gasCost = calculateGasCost(receipt);
       console.log(`✅ Dividend claimed! Block: ${receipt.blockNumber}`);
       console.log(`⛽ Gas used: ${ethers.formatEther(gasCost)} PLS`);
-      this.recordSuccessfulOperation();
       
       return { receipt, gasCost };
     } catch (error) {
@@ -848,10 +572,9 @@ class TimeDividendClaimer {
 
       console.log(`📝 TIME purchase transaction sent: ${tx.hash}`);
       const receipt = await tx.wait();
-      const gasCost = this.calculateGasCost(receipt);
+      const gasCost = calculateGasCost(receipt);
       console.log(`✅ TIME purchase completed! Block: ${receipt.blockNumber}`);
       console.log(`⛽ Gas used: ${ethers.formatEther(gasCost)} PLS`);
-      this.recordSuccessfulOperation();
 
       return { receipt, gasCost };
     } catch (error) {
@@ -860,7 +583,7 @@ class TimeDividendClaimer {
     }
   }
 
-  async swapPlsForSt3(claimedPlsAmount) {
+  async swapPlsForExampleToken(claimedPlsAmount) {
     try {
       // Calculate swap amount from the CLAIMED PLS, not wallet balance
       const swapAmount = (claimedPlsAmount * BigInt(this.buyPercentage)) / BigInt(100);
@@ -870,24 +593,13 @@ class TimeDividendClaimer {
         return null;
       }
 
-      console.log(`🔄 Swapping ${ethers.formatEther(swapAmount)} PLS (${this.buyPercentage}% of claimed) for ST3...`);
+      console.log(`🔄 Swapping ${ethers.formatEther(swapAmount)} PLS (${this.buyPercentage}% of claimed) for exampleToken...`);
 
-      // Get current price for ST3 and calculate slippage protection
-      let amountOutMin = 0n;
-      try {
-        // Get ST3 price from router (PLS -> ST3)
-        const amounts = await this.plsxRouter.getAmountsOut(swapAmount, [WPLS_ADDRESS, ST3_ADDRESS]);
-        const expectedSt3 = amounts[1];
-        const slippageFraction = 1 - (this.st3SlippagePercent / 100);
-        const minSt3 = BigInt(Math.floor(parseFloat(ethers.formatEther(expectedSt3)) * slippageFraction * 1e18).toString());
-        amountOutMin = minSt3;
-        console.log(`📊 Expected ST3 output: ${ethers.formatEther(expectedSt3)} with ${this.st3SlippagePercent}% slippage protection`);
-      } catch (priceError) {
-        console.warn('⚠️  Could not calculate ST3 slippage, proceeding without protection:', priceError.message);
-      }
-
-      // Path: WPLS -> ST3
-      const path = [WPLS_ADDRESS, ST3_ADDRESS];
+      // Path: WPLS -> exampleToken
+      const path = [WPLS_ADDRESS, EXAMPLE_TOKEN_ADDRESS];
+      
+      // Set minimum output to 0 (you may want to add slippage protection)
+      const amountOutMin = 0;
 
       const tx = await this.plsxRouter.swapExactTokensForTokensV2(
         swapAmount,
@@ -902,73 +614,71 @@ class TimeDividendClaimer {
 
       console.log(`📝 Swap transaction sent: ${tx.hash}`);
       const receipt = await tx.wait();
-      const gasCost = this.calculateGasCost(receipt);
+      const gasCost = calculateGasCost(receipt);
       console.log(`✅ Swap completed! Block: ${receipt.blockNumber}`);
       console.log(`⛽ Gas used: ${ethers.formatEther(gasCost)} PLS`);
-      this.recordSuccessfulOperation();
 
       return { receipt, gasCost };
     } catch (error) {
-      console.error('❌ Error swapping PLS for ST3:', error.message);
+      console.error('❌ Error swapping PLS for exampleToken:', error.message);
       throw error;
     }
   }
 
-  async sendSt3ToRecipient() {
+  async sendExampleTokenToRecipient() {
     try {
-      // Get ST3 balance with retry
+      // Get exampleToken balance with retry
       const balance = await this.executeWithRetry(
-        async () => await this.st3Contract.balanceOf(this.wallet.address),
-        'getSt3Balance'
+        async () => await this.exampleTokenContract.balanceOf(this.wallet.address),
+        'getExampleTokenBalance'
       );
       
-      console.log(`📊 Current ST3 balance: ${ethers.formatEther(balance)}`);
+      console.log(`📊 Current exampleToken balance: ${ethers.formatEther(balance)}`);
       
       if (balance === 0n) {
-        console.log('⚠️  No ST3 balance to send - skipping transfer');
+        console.log('⚠️  No exampleToken balance to send - skipping transfer');
         return null;
       }
 
-      console.log(`🔄 Sending ${ethers.formatEther(balance)} ST3 to ${this.st3Recipient}...`);
+      console.log(`🔄 Sending ${ethers.formatEther(balance)} exampleToken to ${this.exampleTokenRecipient}...`);
 
-      const tx = await this.st3Contract.transfer(this.st3Recipient, balance, {
+      const tx = await this.exampleTokenContract.transfer(this.exampleTokenRecipient, balance, {
         gasLimit: 100000
       });
 
       console.log(`📝 Transfer transaction sent: ${tx.hash}`);
       const receipt = await tx.wait();
-      const gasCost = this.calculateGasCost(receipt);
-      console.log(`✅ ST3 sent successfully! Block: ${receipt.blockNumber}`);
+      const gasCost = calculateGasCost(receipt);
+      console.log(`✅ exampleToken sent successfully! Block: ${receipt.blockNumber}`);
       console.log(`⛽ Gas used: ${ethers.formatEther(gasCost)} PLS`);
-      this.recordSuccessfulOperation();
 
       return { receipt, gasCost, amount: balance };
     } catch (error) {
-      console.error('❌ Error sending ST3:', error.message);
+      console.error('❌ Error sending exampleToken:', error.message);
       throw error;
     }
   }
 
-  async checkAndSendExistingSt3() {
+  async checkAndSendExistingExampleToken() {
     try {
-      console.log('\n🔍 Checking for existing ST3 balance from prior operations...');
+      console.log('\n🔍 Checking for existing exampleToken balance from prior operations...');
       
       const balance = await this.executeWithRetry(
-        async () => await this.st3Contract.balanceOf(this.wallet.address),
-        'getStartupSt3Balance'
+        async () => await this.exampleTokenContract.balanceOf(this.wallet.address),
+        'getStartupExampleTokenBalance'
       );
       
       if (balance > 0n) {
-        console.log(`💰 Found ${ethers.formatEther(balance)} ST3 in wallet`);
-        const result = await this.sendSt3ToRecipient();
+        console.log(`💰 Found ${ethers.formatEther(balance)} exampleToken in wallet`);
+        const result = await this.sendExampleTokenToRecipient();
         if (result) {
-          console.log(`✅ Startup cleanup: Sent ${ethers.formatEther(result.amount)} ST3 to recipient`);
+          console.log(`✅ Startup cleanup: Sent ${ethers.formatEther(result.amount)} exampleToken to recipient`);
         }
       } else {
-        console.log('✅ No existing ST3 balance found');
+        console.log('✅ No existing exampleToken balance found');
       }
     } catch (error) {
-      console.error('⚠️  Error checking/sending existing ST3:', error.message);
+      console.error('⚠️  Error checking/sending existing exampleToken:', error.message);
       console.log('Continuing with normal operation...');
     }
   }
@@ -1012,7 +722,7 @@ class TimeDividendClaimer {
         this.isClaimingInProgress = true;
 
         let totalGas = 0n;
-        let st3Sent = 0n;
+        let exampleTokenSent = 0n;
         let timeBought = 0n;
 
         // Step 1: Claim dividend
@@ -1040,42 +750,42 @@ class TimeDividendClaimer {
           console.log('ℹ️  Compound percentage is 0%, skipping TIME purchase');
         }
 
-        // Step 3: Swap percentage of PLS for ST3
+        // Step 3: Swap percentage of PLS for exampleToken
         if (this.buyPercentage > 0) {
-          // Check ST3 balance before swap
-          const st3BalanceBefore = await this.executeWithRetry(
-            async () => await this.st3Contract.balanceOf(this.wallet.address),
-            'getSt3BalanceBefore'
+          // Check exampleToken balance before swap
+          const exampleTokenBalanceBefore = await this.executeWithRetry(
+            async () => await this.exampleTokenContract.balanceOf(this.wallet.address),
+            'getExampleTokenBalanceBefore'
           );
-          console.log(`📊 ST3 balance before swap: ${ethers.formatEther(st3BalanceBefore)}`);
+          console.log(`📊 exampleToken balance before swap: ${ethers.formatEther(exampleTokenBalanceBefore)}`);
 
-          const swapResult = await this.swapPlsForSt3(claimable);
+          const swapResult = await this.swapPlsForExampleToken(claimable);
           if (swapResult) {
             totalGas += swapResult.gasCost;
 
-            // Check ST3 balance after swap to verify tokens were received
-            const st3BalanceAfter = await this.executeWithRetry(
-              async () => await this.st3Contract.balanceOf(this.wallet.address),
-              'getSt3BalanceAfter'
+            // Check exampleToken balance after swap to verify tokens were received
+            const exampleTokenBalanceAfter = await this.executeWithRetry(
+              async () => await this.exampleTokenContract.balanceOf(this.wallet.address),
+              'getExampleTokenBalanceAfter'
             );
-            const st3Received = st3BalanceAfter - st3BalanceBefore;
-            console.log(`📊 ST3 balance after swap: ${ethers.formatEther(st3BalanceAfter)} (+${ethers.formatEther(st3Received)})`);
+            const exampleTokenReceived = exampleTokenBalanceAfter - exampleTokenBalanceBefore;
+            console.log(`📊 exampleToken balance after swap: ${ethers.formatEther(exampleTokenBalanceAfter)} (+${ethers.formatEther(exampleTokenReceived)})`);
 
-            if (st3Received === 0n) {
-              console.log('⚠️  Warning: Swap completed but no ST3 tokens received!');
+            if (exampleTokenReceived === 0n) {
+              console.log('⚠️  Warning: Swap completed but no exampleToken tokens received!');
             }
 
-            // Step 4: Send ST3 to recipient
-            const sendResult = await this.sendSt3ToRecipient();
+            // Step 4: Send exampleToken to recipient
+            const sendResult = await this.sendExampleTokenToRecipient();
             if (sendResult) {
               totalGas += sendResult.gasCost;
-              st3Sent = sendResult.amount;
+              exampleTokenSent = sendResult.amount;
             } else {
-              console.log('⚠️  Warning: ST3 was not sent to recipient (balance might be 0)');
+              console.log('⚠️  Warning: exampleToken was not sent to recipient (balance might be 0)');
             }
           }
         } else {
-          console.log('ℹ️  Buy percentage is 0%, skipping ST3 swap');
+          console.log('ℹ️  Buy percentage is 0%, skipping exampleToken swap');
         }
 
         // Get final PLS balance
@@ -1087,7 +797,7 @@ class TimeDividendClaimer {
         // Update cumulative gas tracker
         this.totalGasSpent += totalGas;
 
-        // Calculate amounts spent on TIME and ST3
+        // Calculate amounts spent on TIME and exampleToken
         const compoundAmount = (claimable * BigInt(this.compoundPercentage)) / BigInt(100);
         const swapAmount = (claimable * BigInt(this.buyPercentage)) / BigInt(100);
         const totalSpent = compoundAmount + swapAmount + totalGas;
@@ -1097,7 +807,7 @@ class TimeDividendClaimer {
         console.log(`\n📈 Summary:`);
         console.log(`   💰 PLS Claimed: ${ethers.formatEther(claimable)}`);
         console.log(`   🔄 TIME Compounded: ${ethers.formatEther(timeBought)} (${ethers.formatEther(compoundAmount)} PLS spent)`);
-        console.log(`   📤 ST3 Sent: ${ethers.formatEther(st3Sent)} (${ethers.formatEther(swapAmount)} PLS spent)`);
+        console.log(`   📤 exampleToken Sent: ${ethers.formatEther(exampleTokenSent)} (${ethers.formatEther(swapAmount)} PLS spent)`);
         console.log(`   ⛽ Total Gas: ${ethers.formatEther(totalGas)} PLS`);
         console.log(`   💸 Total Spent: ${ethers.formatEther(totalSpent)} PLS (compound + swap + gas)`);
         console.log(`   💵 PLS Balance: ${ethers.formatEther(plsBalanceBefore)} → ${ethers.formatEther(plsBalanceAfter)}`);
@@ -1119,12 +829,6 @@ class TimeDividendClaimer {
 
   async start() {
     console.log('🚀 Starting Time Dividend Claimer...\n');
-
-    // Validate contracts exist and have required functions before starting
-    const abiValid = await this.validateContractAbis();
-    if (!abiValid) {
-      process.exit(1);
-    }
 
     // Get configuration from user at startup
     console.log('⚙️  === PRICE TRADING CONFIGURATION ===');
@@ -1153,8 +857,8 @@ class TimeDividendClaimer {
       this.priceMonitoringActive = false;
     }
 
-    // Check and send any existing ST3 balance from prior runs
-    await this.checkAndSendExistingSt3();
+    // Check and send any existing exampleToken balance from prior runs
+    await this.checkAndSendExistingExampleToken();
 
     // Run initial check
     await this.checkAndClaim();
@@ -1168,11 +872,6 @@ class TimeDividendClaimer {
     const statsInterval = setInterval(() => {
       this.getSessionStats();
     }, 60 * 1000);
-
-    // Schedule health checks (every 5 minutes)
-    const healthInterval = setInterval(() => {
-      this.checkHealth();
-    }, this.healthCheckInterval);
 
     console.log(`\n✅ Bot is running!`);
     console.log(`   ⏰ Claim check: every ${this.claimCheckInterval / 60000} minutes`);
