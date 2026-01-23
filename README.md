@@ -4,7 +4,7 @@
 
 --*MAY HAVE BUGS UNTIL THIS LINE IS REMOVED*--
 
-Automated TIME token dividend claimer and portfolio manager for PulseChain with advanced trading features.
+Automated TIME token dividend claimer and portfolio manager for PulseChain with advanced trading features. Absolutely no added fees/lockups etc, your tokens remain in your control only. This is not a liquidity pool, it is automated trading in response to external trades on decentralized exchange pairs. May expierence volatility. You alone are responsible for every aspect of interacting with decentralized technologies. 
 
 ## Features ✨
 
